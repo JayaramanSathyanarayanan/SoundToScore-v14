@@ -35,6 +35,7 @@ body{background:var(--ink);color:var(--text);font-family:'Outfit',sans-serif;min
 .mode-btn:hover:not(.on){color:var(--text)}
 /* Upload button in topbar */
 .tb-upload{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-settings-btn{display:none}
 .upload-pill{display:flex;align-items:center;gap:8px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:6px 14px;cursor:pointer;transition:all .2s;font-size:.8rem;color:var(--gold);font-weight:600}
 .upload-pill:hover{background:rgba(245,166,35,.14);border-color:var(--gold)}
 .up-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dp 2s ease-in-out infinite}
@@ -247,203 +248,219 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--purple)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* ═══════════════════════════════════════════
-   BOTTOM NAV — mobile only, hidden on desktop
+   DRAWER OVERLAY — fullscreen backdrop
+═══════════════════════════════════════════ */
+.drawer-overlay{
+  display:none;position:fixed;inset:0;background:rgba(8,6,10,.75);
+  z-index:400;backdrop-filter:blur(4px);
+}
+.drawer-overlay.on{display:block}
+
+/* ═══════════════════════════════════════════
+   DRAWER PANELS — slide in from sides
+   Works on ALL screen sizes via JS toggle
+═══════════════════════════════════════════ */
+.left-panel.drawer-open,
+.right-panel.drawer-open{
+  display:flex !important;
+  position:fixed;top:0;bottom:0;z-index:450;
+  width:min(300px,88vw);
+  animation:slideInLeft .22s ease;
+}
+.left-panel.drawer-open{left:0;}
+.right-panel.drawer-open{right:0;animation:slideInRight .22s ease;}
+@keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+
+/* Drawer close X button — shown when drawer is open */
+.drawer-close{
+  position:absolute;top:10px;right:10px;z-index:10;
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--border);background:var(--panel);
+  color:var(--muted);cursor:pointer;font-size:14px;
+  align-items:center;justify-content:center;
+  display:none; /* shown via JS when drawer opens */
+}
+
+/* ═══════════════════════════════════════════
+   BOTTOM NAV — tablet & mobile
 ═══════════════════════════════════════════ */
 .bottom-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;
   background:rgba(8,6,10,.97);backdrop-filter:blur(20px);
   border-top:1px solid var(--border);
-  padding:8px 0 max(8px, env(safe-area-inset-bottom));
+  padding:6px 0 max(6px, env(safe-area-inset-bottom));
 }
 .bn-items{display:flex;align-items:center;justify-content:space-around}
 .bn-btn{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:6px 16px;border:none;background:none;color:var(--muted);
-  font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.06em;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:5px 10px;border:none;background:none;color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.05em;
   text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:8px;
-  position:relative;
+  position:relative;min-width:52px;
 }
 .bn-btn.on{color:var(--gold)}
-.bn-btn-icon{font-size:20px}
+.bn-btn:hover{color:var(--text)}
+.bn-btn-icon{font-size:18px;line-height:1}
 .bn-badge{
-  position:absolute;top:2px;right:8px;
+  position:absolute;top:2px;right:6px;
   background:var(--green);color:var(--ink);
-  border-radius:100px;font-size:.45rem;padding:1px 5px;
+  border-radius:100px;font-size:.42rem;padding:1px 4px;
   font-weight:700;display:none;
 }
 .bn-badge.on{display:block}
 
 /* ═══════════════════════════════════════════
-   SIDE DRAWER — slides in from left/right on mobile
+   MOBILE MODE BAR — below topbar on small screens
 ═══════════════════════════════════════════ */
-.drawer-overlay{
-  display:none;position:fixed;inset:0;background:rgba(8,6,10,.7);
-  z-index:400;backdrop-filter:blur(4px);
-  animation:fadeIn .2s ease;
-}
-.drawer-overlay.on{display:block}
-.left-panel.drawer-open,
-.right-panel.drawer-open{
-  display:flex !important;position:fixed;top:0;bottom:0;z-index:450;
-  animation:slideIn .25s ease;width:min(300px,92vw);
-}
-.left-panel.drawer-open{left:0;border-right:1px solid var(--border)}
-.right-panel.drawer-open{right:0;border-left:1px solid var(--border)}
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-
-/* Drawer close button */
-.drawer-close{
-  display:none;position:absolute;top:12px;right:12px;z-index:10;
-  width:28px;height:28px;border-radius:50%;
-  border:1px solid var(--border);background:var(--card);
-  color:var(--muted);cursor:pointer;font-size:14px;
-  display:none;align-items:center;justify-content:center;
+.mobile-mode-bar{
+  display:none;gap:4px;padding:7px 14px;
+  background:var(--surf);border-bottom:1px solid var(--border);
+  justify-content:center;flex-shrink:0;flex-wrap:wrap;
 }
 
 /* ═══════════════════════════════════════════
-   DESKTOP: 1280px+  (3-column full)
+   DESKTOP: 1280px+ — full 3-column
 ═══════════════════════════════════════════ */
 @media(min-width:1280px){
-  .main{grid-template-columns:260px 1fr 280px;height:calc(100vh - 58px)}
-  .left-panel,.right-panel{display:flex}
+  body{grid-template-rows:auto 1fr}
+  .main{grid-template-columns:260px 1fr 280px;height:calc(100vh - 58px);overflow:hidden}
+  .left-panel{display:flex}
+  .right-panel{display:flex}
   .bottom-nav{display:none}
+  .mobile-mode-bar{display:none}
+  .mode-group{display:flex}
   .topbar{gap:16px;padding:0 24px}
-  .upload-card{margin:40px auto;padding:36px}
-  .score-area{padding:24px}
+  .upload-card{margin:40px auto;padding:36px;max-width:560px}
+  .score-area{padding:24px;overflow-y:auto}
+  .center-panel{overflow:hidden}
 }
 
 /* ═══════════════════════════════════════════
-   TABLET LANDSCAPE: 900–1279px (2-column, right hidden)
+   TABLET LANDSCAPE: 900–1279px
+   Left panel visible; right panel via drawer
 ═══════════════════════════════════════════ */
 @media(min-width:900px) and (max-width:1279px){
-  .main{grid-template-columns:240px 1fr;height:calc(100vh - 58px)}
+  body{grid-template-rows:auto 1fr}
+  .main{grid-template-columns:240px 1fr;height:calc(100vh - 58px);overflow:hidden}
   .left-panel{display:flex;width:240px}
-  .right-panel{display:none}
+  .right-panel{display:none} /* opened as drawer via Settings btn */
   .bottom-nav{display:none}
-  .topbar{gap:12px;padding:0 18px}
-  .tb-sep:nth-child(4){display:none}
-  .mode-group{display:none}
-  .upload-card{margin:32px auto;padding:28px;max-width:480px}
-  .score-area{padding:20px}
+  .mobile-mode-bar{display:none}
+  .mode-group{display:flex} /* show in topbar */
+  .topbar{gap:10px;padding:0 18px}
+  .score-area{padding:20px;overflow-y:auto}
+  .upload-card{margin:28px auto;padding:28px;max-width:500px}
   .settings-row{grid-template-columns:1fr 1fr}
+  /* Add settings button to topbar */
+  .tb-settings-btn{display:flex}
+  #tbSettingsBtn{display:inline-flex !important}
 }
 
 /* ═══════════════════════════════════════════
    TABLET PORTRAIT: 600–899px
+   Both panels via drawer; bottom nav shown
 ═══════════════════════════════════════════ */
 @media(min-width:600px) and (max-width:899px){
-  .main{grid-template-columns:1fr;height:calc(100vh - 58px - 64px)}
-  .left-panel{display:none}
-  .right-panel{display:none}
+  body{grid-template-rows:auto auto 1fr}
+  .main{grid-template-columns:1fr;height:calc(100vh - 52px - 42px - 64px);overflow:hidden}
+  .left-panel{display:none}  /* drawer only */
+  .right-panel{display:none} /* drawer only */
   .bottom-nav{display:block}
-  /* Topbar: hide non-essential */
-  .tb-sep{display:none}
+  .mobile-mode-bar{display:flex}
   .mode-group{display:none}
+  .tb-sep{display:none}
   .tb-play{display:none !important}
-  .topbar{gap:8px;padding:0 16px;height:52px}
+  .topbar{gap:8px;padding:0 14px;height:52px}
   .logo-ver{display:none}
-  .upload-card{margin:24px auto;padding:24px;max-width:520px}
-  .score-area{padding:16px;padding-bottom:80px}
+  .score-area{padding:16px;overflow-y:auto;padding-bottom:8px}
+  .upload-card{margin:20px auto;padding:22px;max-width:520px}
   .settings-row{grid-template-columns:1fr 1fr}
   .dlrow{gap:5px}
   .dlbtn{padding:5px 9px;font-size:.68rem}
-  /* Floating mode bar below topbar */
-  .mobile-mode-bar{
-    display:flex;gap:4px;padding:8px 16px;background:var(--surf);
-    border-bottom:1px solid var(--border);justify-content:center;
-  }
-}
-@media(min-width:600px) and (max-width:899px){
-  .mobile-mode-bar{display:flex}
+  .center-panel{overflow:hidden}
+  .score-toolbar{padding:8px 14px}
 }
 
 /* ═══════════════════════════════════════════
-   MOBILE: 360–599px
+   MOBILE: up to 599px
+   Full-width; bottom nav; everything via drawer
 ═══════════════════════════════════════════ */
 @media(max-width:599px){
-  .main{grid-template-columns:1fr;height:auto;min-height:calc(100vh - 52px - 62px);overflow:visible}
-  .left-panel,.right-panel{display:none}
+  body{grid-template-rows:auto auto 1fr;overflow-x:hidden}
+  .main{grid-template-columns:1fr;height:auto;min-height:calc(100dvh - 52px - 40px - 62px);overflow:visible}
+  .left-panel{display:none}  /* drawer only */
+  .right-panel{display:none} /* drawer only */
   .center-panel{height:auto;overflow:visible}
-  .score-area{flex:none;overflow:visible;padding:12px;padding-bottom:80px}
+  .score-area{flex:none;overflow:visible;padding:10px;padding-bottom:72px}
   .bottom-nav{display:block}
-  /* Topbar: minimal */
+  .mobile-mode-bar{display:flex}
+  /* Topbar: compact */
+  .mode-group{display:none}
+  .tb-sep{display:none !important}
+  .tb-play{display:none !important}
+  .score-meta{display:none}
   .topbar{padding:0 12px;height:52px;gap:8px}
-  .tb-sep,.mode-group,.tb-play,.score-meta{display:none !important}
   .logo-ver{display:none}
-  .logo-name{font-size:1rem}
-  .upload-pill{padding:5px 10px;font-size:.72rem}
-  .upload-pill span:not(.up-dot){display:none}
+  .logo-name{font-size:.95rem}
+  .upload-pill{padding:5px 10px;font-size:.72rem;gap:6px}
+  .upload-pill span:not(.up-dot){font-size:.72rem}
   /* Upload card */
-  .upload-card{margin:12px;padding:18px;border-radius:14px;max-width:100%}
-  .uc-icon{font-size:38px;margin-bottom:10px}
-  .uc-title{font-size:1.25rem}
-  .uc-sub{font-size:.78rem;margin-bottom:16px}
-  .dz{padding:24px 16px;margin-bottom:10px}
-  .settings-row{grid-template-columns:1fr}
-  .cvt-btn{padding:14px;font-size:.88rem}
+  .upload-card{margin:10px;padding:16px;border-radius:14px;max-width:100%}
+  .uc-icon{font-size:36px;margin-bottom:8px}
+  .uc-title{font-size:1.2rem}
+  .uc-sub{font-size:.76rem;margin-bottom:14px}
+  .dz{padding:22px 14px;margin-bottom:10px}
+  .settings-row{grid-template-columns:1fr 1fr;gap:8px}
+  .cvt-btn{padding:13px;font-size:.86rem}
   /* Section cards */
   .sc{border-radius:10px}
   .sc-hdr{padding:9px 12px}
   .sc-body{padding:10px 12px}
-  .sc-ttl{font-size:.8rem}
+  .sc-ttl{font-size:.78rem}
   .dlrow{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-  .dlbtn{padding:7px 5px;font-size:.68rem;justify-content:center}
-  /* Progress steps */
-  .pstep{padding:7px 10px;font-size:.74rem}
+  .dlbtn{padding:7px 5px;font-size:.66rem;justify-content:center}
+  /* Progress */
+  .pstep{padding:7px 10px;font-size:.72rem}
   /* Score toolbar */
   .score-toolbar{padding:8px 12px;gap:6px}
-  .score-title{font-size:.82rem}
-  .stb-btn{padding:4px 9px;font-size:.66rem}
+  .score-title{font-size:.8rem}
+  .stb-btn{padding:4px 8px;font-size:.64rem}
   /* Modal */
-  .modal{padding:18px;border-radius:12px;max-width:calc(100vw - 24px)}
-  .modal-title{font-size:1rem}
-  /* Orchestra */
-  .orch-section{padding:10px}
-  .orch-lname{min-width:70px;font-size:.7rem}
+  .modal{padding:16px;border-radius:12px;max-width:calc(100vw - 20px)}
+  .modal-title{font-size:.95rem}
   /* Transcript */
-  .trbody{font-size:.64rem;max-height:90px}
-  /* Toast: bottom nav safe zone */
-  .toast{bottom:76px;right:12px;left:12px;max-width:100%}
-  /* Mobile mode bar */
-  .mobile-mode-bar{display:flex}
+  .trbody{font-size:.62rem;max-height:90px}
+  /* Toast: above bottom nav */
+  .toast{bottom:72px;right:10px;left:10px;max-width:100%}
 }
 
 /* ═══════════════════════════════════════════
    SMALL MOBILE: < 360px
 ═══════════════════════════════════════════ */
 @media(max-width:359px){
-  .upload-card{margin:8px;padding:14px}
-  .uc-title{font-size:1.1rem}
+  .upload-card{margin:6px;padding:12px}
+  .uc-title{font-size:1.05rem}
   .dlrow{grid-template-columns:1fr}
-  .mode-btn{padding:4px 8px;font-size:.58rem}
-}
-
-/* ═══════════════════════════════════════════
-   SHARED: mobile mode bar (tablet + mobile)
-═══════════════════════════════════════════ */
-.mobile-mode-bar{
-  display:none;gap:4px;padding:8px 14px;
-  background:var(--surf);border-bottom:1px solid var(--border);
-  justify-content:center;flex-shrink:0;
-}
-@media(max-width:899px){
-  .mobile-mode-bar{display:flex}
-  body{grid-template-rows:auto auto 1fr}
+  .mode-btn{padding:5px 8px;font-size:.58rem}
+  .bn-btn{padding:4px 6px;min-width:44px}
 }
 
 /* ═══════════════════════════════════════════
    TOUCH targets — all interactive >= 44px
 ═══════════════════════════════════════════ */
 @media(hover:none){
-  .mpb,.pb-btn,.orch-lplay{width:40px;height:40px}
+  .mpb,.pb-btn,.orch-lplay{width:40px;height:40px;font-size:13px}
   .dlbtn{min-height:40px}
-  .mode-btn{padding:8px 14px}
-  .tpreset{padding:5px 12px}
-  .bn-btn{padding:8px 20px}
+  .mode-btn{padding:7px 12px}
+  .tpreset{padding:6px 12px}
+  .bn-btn{padding:6px 10px}
+  .iitem{padding:9px 16px 9px 32px;min-height:44px}
+  .fmt-btn{min-height:44px}
 }
 
 /* ═══════════════════════════════════════════
-   PRINT — basic support
+   PRINT
 ═══════════════════════════════════════════ */
 @media print{
   .topbar,.bottom-nav,.toast,.modal-bg,.score-toolbar{display:none !important}
@@ -478,8 +495,9 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--purple)}
     <audio id="globalAudio" onended="globalEnded()" ontimeupdate="globalTick()" onloadedmetadata="globalMeta()"></audio>
   </div>
   <div class="tb-upload">
+    <button class="stb-btn" id="tbSettingsBtn" onclick="openDrawer('right')" style="display:none">⚙ Settings</button>
     <div class="upload-pill" onclick="document.getElementById('fi').click()">
-      <span class="up-dot"></span> Upload Audio
+      <span class="up-dot"></span><span>Upload Audio</span>
     </div>
     <button class="stb-btn" onclick="showModal()">⬇ Downloads</button>
   </div>
@@ -500,7 +518,7 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--purple)}
 
   <!-- LEFT: INSTRUMENT TREE -->
   <aside class="left-panel" id="leftPanel">
-    <button class="drawer-close" id="leftDrawerClose" onclick="closeDrawers()" style="display:none;position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:14px;align-items:center;justify-content:center;z-index:10">✕</button>
+    <button class="drawer-close" id="leftDrawerClose" onclick="closeDrawers()">✕</button>
     <div class="lp-head">
       <div class="lp-title">Instruments</div>
       <input class="lp-search" id="instrSearch" placeholder="Search..." oninput="filterInstruments(this.value)">
@@ -621,7 +639,7 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--purple)}
 
   <!-- RIGHT PANEL -->
   <aside class="right-panel" id="rightPanel">
-    <button class="drawer-close" id="rightDrawerClose" onclick="closeDrawers()" style="display:none;position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:14px;align-items:center;justify-content:center;z-index:10">✕</button>
+    <button class="drawer-close" id="rightDrawerClose" onclick="closeDrawers()">✕</button>
     <div class="rp-head">
       <div class="rp-title">Settings</div>
       <div class="sel-instr"><span class="sel-label">Selected Instrument</span><span id="selInstrName">Solo Cornet</span></div>
@@ -703,10 +721,27 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--purple)}
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// BG CANVAS
+// STATE — declared FIRST so nothing is in TDZ
+// ═══════════════════════════════════════════════════════════
+let selInstr       = 'solo_cornet';
+let selMode        = 'auto';
+let selFmt         = 'wav';
+let selFile        = null;
+let pollingInt     = null;
+let renderedSet    = new Set();
+let allJobChunks   = [];
+let lastJobData    = null;
+
+// API URL — update to your Render backend URL
+const API = 'https://soundtoscore-v14.onrender.com';
+
+// ═══════════════════════════════════════════════════════════
+// BG CANVAS — null-guarded so missing canvas never crashes JS
 // ═══════════════════════════════════════════════════════════
 (function(){
-  const c=document.getElementById('bgc'),ctx=c.getContext('2d');let t=0;
+  const c=document.getElementById('bgc');
+  if(!c) return; // no canvas element — skip silently
+  const ctx=c.getContext('2d');let t=0;
   function rs(){c.width=window.innerWidth;c.height=window.innerHeight}rs();
   window.addEventListener('resize',rs);
   function draw(){
@@ -881,21 +916,7 @@ const INSTR_CATS=[
   ]},
 ];
 
-// ═══════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════
-let selInstr       = 'solo_cornet';
-let selMode        = 'auto';
-let selFmt         = 'wav';
-let selFile        = null;
-let pollingInt     = null;
-let renderedSet    = new Set();
-let allJobChunks   = [];
-let lastJobData    = null;   // full last status response (for modal)
-
-// API URL — update to your Render backend URL
-  
-const API = 'https://soundtoscore-v14.onrender.com';
+// (STATE and API declared at top of script)
 
 // ═══════════════════════════════════════════════════════════
 // BUILD INSTRUMENT TREE
@@ -1483,22 +1504,22 @@ function updateBadge(count) {
 }
 
 function bnTab(tab) {
-  if (!isMobile()) return;
   ['bnHome','bnInstr','bnResults','bnSettings'].forEach(id => {
     const el=document.getElementById(id); if(el) el.classList.remove('on');
   });
   closeDrawers();
   if (tab==='home') {
     const bh=document.getElementById('bnHome'); if(bh) bh.classList.add('on');
-    document.getElementById('uploadCard').scrollIntoView({behavior:'smooth',block:'start'});
+    const uc=document.getElementById('uploadCard');
+    if(uc) uc.scrollIntoView({behavior:'smooth',block:'start'});
   } else if (tab==='instr') {
     const bi=document.getElementById('bnInstr'); if(bi) bi.classList.add('on');
     openDrawer('left');
   } else if (tab==='results') {
     const br=document.getElementById('bnResults'); if(br) br.classList.add('on');
     const res=document.getElementById('results');
-    if (res && res.style.display!=='none') res.scrollIntoView({behavior:'smooth',block:'start'});
-    else showToast('No results yet','info');
+    if(res && res.style.display!=='none') res.scrollIntoView({behavior:'smooth',block:'start'});
+    else showToast('No results yet — convert a file first','info');
   } else if (tab==='settings') {
     const bs=document.getElementById('bnSettings'); if(bs) bs.classList.add('on');
     openDrawer('right');
@@ -1509,23 +1530,34 @@ function openDrawer(side) {
   const overlay=document.getElementById('drawerOverlay');
   if(overlay) overlay.classList.add('on');
   if (side==='left') {
-    const lp=document.getElementById('leftPanel'); if(lp) lp.classList.add('drawer-open');
-    const btn=document.getElementById('leftDrawerClose'); if(btn) btn.style.display='flex';
+    const lp=document.getElementById('leftPanel');
+    if(lp) lp.classList.add('drawer-open');
+    const btn=document.getElementById('leftDrawerClose');
+    if(btn) btn.style.display='flex';
   } else {
-    const rp=document.getElementById('rightPanel'); if(rp) rp.classList.add('drawer-open');
-    const btn=document.getElementById('rightDrawerClose'); if(btn) btn.style.display='flex';
+    const rp=document.getElementById('rightPanel');
+    if(rp) rp.classList.add('drawer-open');
+    const btn=document.getElementById('rightDrawerClose');
+    if(btn) btn.style.display='flex';
   }
   document.body.style.overflow='hidden';
 }
 
 function closeDrawers() {
-  const overlay=document.getElementById('drawerOverlay'); if(overlay) overlay.classList.remove('on');
-  const lp=document.getElementById('leftPanel'); if(lp) lp.classList.remove('drawer-open');
-  const rp=document.getElementById('rightPanel'); if(rp) rp.classList.remove('drawer-open');
-  const lb=document.getElementById('leftDrawerClose'); if(lb) lb.style.display='none';
-  const rb=document.getElementById('rightDrawerClose'); if(rb) rb.style.display='none';
+  const overlay=document.getElementById('drawerOverlay');
+  if(overlay) overlay.classList.remove('on');
+  const lp=document.getElementById('leftPanel');
+  if(lp) lp.classList.remove('drawer-open');
+  const rp=document.getElementById('rightPanel');
+  if(rp) rp.classList.remove('drawer-open');
+  const lb=document.getElementById('leftDrawerClose');
+  if(lb) lb.style.display='none';
+  const rb=document.getElementById('rightDrawerClose');
+  if(rb) rb.style.display='none';
   document.body.style.overflow='';
-  ['bnHome','bnInstr','bnResults','bnSettings'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('on');});
+  ['bnHome','bnInstr','bnResults','bnSettings'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('on');
+  });
 }
 
 // Touch swipe to close drawers
@@ -1538,919 +1570,18 @@ document.addEventListener('touchend', e=>{
   if(rp&&rp.classList.contains('drawer-open')&&dx>60) closeDrawers();
 },{passive:true});
 
-window.addEventListener('resize',()=>{if(!isMobile()){closeDrawers();document.body.style.overflow='';}});
+window.addEventListener('resize',()=>{
+  if(window.innerWidth >= 1280){
+    closeDrawers();
+    document.body.style.overflow='';
+  }
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawers();closeModal();}});
 
-</script>
-
-<script>
-// ✅ UPDATE THIS to your Hugging Face Space URL
-// Format: https://YOUR-USERNAME-soundtoscore.hf.space
-// Or keep empty string '' if frontend and backend are same origin
-// ✅ UPDATE THIS to your Render service URL after deploying backend
-// Format: https://YOUR-SERVICE-NAME.onrender.com
-// Example: https://soundtoscore-v14.onrender.com
-const API = 'https://soundtoscore-v14.onrender.com';
-
-// ══════════════════════════════════════════════════════════
-// INSTRUMENT DATA — V14 full list
-// ══════════════════════════════════════════════════════════
-const INSTR_CATS = [
-  { cat:'brass', label:'🎺 Brass Band', groups:[
-    { group:'Cornets', items:[
-      {id:'soprano_cornet', n:'Soprano Cornet', sub:'Eb', info:'Highest cornet. Brilliant top melody tone.'},
-      {id:'solo_cornet',    n:'Solo Cornet',    sub:'Bb', info:'Principal brass band melody instrument.'},
-      {id:'repiano_cornet', n:'Repiano Cornet', sub:'Bb', info:'Bridge between solo and tutti cornets.'},
-      {id:'cornet_2nd',     n:'2nd Cornet',     sub:'Bb', info:'Inner harmony support.'},
-      {id:'cornet_3rd',     n:'3rd Cornet',     sub:'Bb', info:'Lower harmony and bass support.'},
-    ]},
-    { group:'Flugel & Horns', items:[
-      {id:'flugelhorn',      n:'Flugelhorn',      sub:'Bb', info:'Warm, mellow Bb voice.'},
-      {id:'solo_tenor_horn', n:'Solo Tenor Horn', sub:'Eb', info:'Principal mid-range Eb voice.'},
-      {id:'tenor_horn_1st',  n:'1st Tenor Horn',  sub:'Eb', info:'1st harmony horn.'},
-      {id:'tenor_horn_2nd',  n:'2nd Tenor Horn',  sub:'Eb', info:'2nd harmony horn.'},
-    ]},
-    { group:'Baritones & Euphonium', items:[
-      {id:'baritone_1st', n:'1st Baritone', sub:'Bb', info:'Upper baritone part.'},
-      {id:'baritone_2nd', n:'2nd Baritone', sub:'Bb', info:'Lower baritone harmony.'},
-      {id:'euphonium',    n:'Euphonium',    sub:'Bb', info:'Expressive bass voice, often soloistic.'},
-    ]},
-    { group:'Trombones', items:[
-      {id:'trombone_1st',  n:'1st Trombone',  sub:'Bb', info:'Lead trombone.'},
-      {id:'trombone_2nd',  n:'2nd Trombone',  sub:'Bb', info:'Harmony trombone.'},
-      {id:'bass_trombone', n:'Bass Trombone', sub:'C',  info:'Dark anchoring bass trombone.'},
-    ]},
-    { group:'Basses', items:[
-      {id:'eb_bass',  n:'Eb Bass (Tuba)',  sub:'Eb',  info:'Upper bass tuba.'},
-      {id:'bbb_bass', n:'BBb Bass (Tuba)', sub:'BBb', info:'Deepest tuba — band foundation.'},
-    ]},
-  ]},
-  { cat:'trumpet', label:'🎺 Trumpet Family', groups:[
-    { group:'Trumpets', items:[
-      {id:'trumpet_bb',      n:'Trumpet Bb',      sub:'Bb', info:'Standard orchestral Bb trumpet.'},
-      {id:'trumpet_c',       n:'Trumpet C',       sub:'C',  info:'Concert pitch C trumpet.'},
-      {id:'trumpet_d',       n:'Trumpet D',       sub:'D',  info:'High D trumpet.'},
-      {id:'trumpet_eb',      n:'Trumpet Eb',      sub:'Eb', info:'Piccolo Eb trumpet.'},
-      {id:'piccolo_trumpet', n:'Piccolo Trumpet', sub:'',   info:'Highest pitch trumpet.'},
-      {id:'pocket_trumpet',  n:'Pocket Trumpet',  sub:'Bb', info:'Compact Bb trumpet.'},
-      {id:'muted_trumpet',   n:'Muted Trumpet',   sub:'',   info:'Cup-muted sound.'},
-      {id:'harmon_trumpet',  n:'Harmon Trumpet',  sub:'',   info:'Jazz wah-wah mute.'},
-    ]},
-    { group:'Horns', items:[
-      {id:'french_horn', n:'French Horn', sub:'F', info:'Rich Romantic-era horn.'},
-      {id:'tenor_horn',  n:'Tenor Horn',  sub:'Eb', info:'Eb melody horn.'},
-    ]},
-  ]},
-  { cat:'piano', label:'🎹 Piano', groups:[
-    { group:'Acoustic', items:[
-      {id:'concert_grand',  n:'Concert Grand',  sub:'', info:'Full 9-foot Steinway tone.'},
-      {id:'baby_grand',     n:'Baby Grand',     sub:'', info:'Compact grand piano.'},
-      {id:'upright',        n:'Upright Piano',  sub:'', info:'Warm upright tone.'},
-      {id:'studio_piano',   n:'Studio Piano',   sub:'', info:'Bright studio instrument.'},
-      {id:'honky_tonk',     n:'Honky Tonk',     sub:'', info:'Detuned saloon piano.'},
-      {id:'felt_piano',     n:'Felt Piano',     sub:'', info:'Soft muted tone.'},
-      {id:'prepared_piano', n:'Prepared Piano', sub:'', info:'Objects placed on strings — experimental.'},
-    ]},
-    { group:'Electric', items:[
-      {id:'rhodes',     n:'Rhodes',     sub:'', info:'Classic electric piano warmth.'},
-      {id:'wurlitzer',  n:'Wurlitzer',  sub:'', info:'Vintage Wurlitzer electric.'},
-      {id:'fm_piano',   n:'FM Piano',   sub:'', info:'DX7-style FM synthesis.'},
-    ]},
-  ]},
-  { cat:'strings', label:'🎻 Strings', groups:[
-    { group:'Solo Strings', items:[
-      {id:'violin',      n:'Violin',      sub:'', info:'Highest orchestral string.'},
-      {id:'viola',       n:'Viola',       sub:'', info:'Mid-range string, rich tone.'},
-      {id:'cello',       n:'Cello',       sub:'', info:'Deep, expressive bass string.'},
-      {id:'double_bass', n:'Double Bass', sub:'', info:'Lowest orchestral string.'},
-    ]},
-    { group:'Ensemble', items:[
-      {id:'string_ensemble', n:'String Ensemble', sub:'', info:'Full string section.'},
-      {id:'pizzicato',       n:'Pizzicato',       sub:'', info:'Plucked string articulation.'},
-      {id:'tremolo',         n:'Tremolo',         sub:'', info:'Rapid bow tremolo.'},
-      {id:'staccato',        n:'Staccato',        sub:'', info:'Short detached bowing.'},
-    ]},
-  ]},
-  { cat:'woodwinds', label:'🪈 Woodwinds', groups:[
-    { group:'Flutes', items:[
-      {id:'flute',      n:'Flute',      sub:'C', info:'Bright concert flute.'},
-      {id:'piccolo',    n:'Piccolo',    sub:'',  info:'Highest woodwind.'},
-      {id:'alto_flute', n:'Alto Flute', sub:'G', info:'Warm low flute.'},
-    ]},
-    { group:'Single Reed', items:[
-      {id:'clarinet',      n:'Clarinet',      sub:'Bb', info:'Versatile Bb clarinet.'},
-      {id:'bass_clarinet', n:'Bass Clarinet', sub:'Bb', info:'Deep, rich bass clarinet.'},
-    ]},
-    { group:'Double Reed', items:[
-      {id:'oboe',    n:'Oboe',    sub:'', info:'Penetrating nasal tone.'},
-      {id:'bassoon', n:'Bassoon', sub:'', info:'Deep double-reed bass.'},
-    ]},
-    { group:'Saxophones', items:[
-      {id:'alto_sax',     n:'Alto Sax',     sub:'Eb', info:'Classic jazz alto.'},
-      {id:'tenor_sax',    n:'Tenor Sax',    sub:'Bb', info:'Warm tenor saxophone.'},
-      {id:'baritone_sax', n:'Baritone Sax', sub:'Eb', info:'Deep bari saxophone.'},
-    ]},
-  ]},
-  { cat:'guitar', label:'🎸 Guitar & Bass', groups:[
-    { group:'Guitar', items:[
-      {id:'acoustic_guitar',   n:'Acoustic Guitar',   sub:'', info:'Warm steel-string acoustic.'},
-      {id:'electric_guitar',   n:'Electric Guitar',   sub:'', info:'Clean electric tone.'},
-      {id:'distortion_guitar', n:'Distortion Guitar', sub:'', info:'Heavy overdrive.'},
-    ]},
-    { group:'Bass', items:[
-      {id:'electric_bass', n:'Electric Bass', sub:'', info:'Standard electric bass.'},
-      {id:'slap_bass',     n:'Slap Bass',     sub:'', info:'Funky slap technique.'},
-    ]},
-  ]},
-  { cat:'percussion', label:'🥁 Percussion', groups:[
-    { group:'Pitched', items:[
-      {id:'timpani',       n:'Timpani',       sub:'', info:'Tunable kettle drums.'},
-      {id:'glockenspiel',  n:'Glockenspiel',  sub:'', info:'Bright metallic bars.'},
-      {id:'xylophone',     n:'Xylophone',     sub:'', info:'Wooden mallet bars.'},
-      {id:'tubular_bells', n:'Tubular Bells', sub:'', info:'Church-bell resonance.'},
-    ]},
-    { group:'Unpitched', items:[
-      {id:'drum_kit',   n:'Drum Kit',   sub:'', info:'Full rhythmic kit.'},
-      {id:'snare_drum', n:'Snare Drum', sub:'', info:'Military snare attack.'},
-      {id:'bass_drum',  n:'Bass Drum',  sub:'', info:'Deep downbeat boom.'},
-      {id:'cymbals',    n:'Cymbals',    sub:'', info:'Crash and shimmer.'},
-      {id:'triangle',   n:'Triangle',   sub:'', info:'Light ringing tone.'},
-      {id:'tambourine', n:'Tambourine', sub:'', info:'Rhythmic jingle texture.'},
-    ]},
-  ]},
-  { cat:'synth', label:'🎛️ Synth', groups:[
-    { group:'Synthesis', items:[
-      {id:'synth_lead', n:'Synth Lead', sub:'', info:'Bright mono lead synth.'},
-      {id:'synth_pad',  n:'Synth Pad',  sub:'', info:'Lush atmospheric pad.'},
-      {id:'synth_bass', n:'Synth Bass', sub:'', info:'Punchy electronic bass.'},
-    ]},
-  ]},
-  { cat:'world', label:'🌍 World', groups:[
-    { group:'World Instruments', items:[
-      {id:'sitar',     n:'Sitar',     sub:'', info:'Indian classical string.'},
-      {id:'tabla',     n:'Tabla',     sub:'', info:'Indian hand drums.'},
-      {id:'pan_flute', n:'Pan Flute', sub:'', info:'Andean wind pipes.'},
-      {id:'accordion', n:'Accordion', sub:'', info:'Bellows-driven reeds.'},
-    ]},
-  ]},
-];
-
-// ── State ──────────────────────────────────────────────────
-let selInstr      = 'solo_cornet';
-let selMode       = 'auto';
-let selFmt        = 'wav';
-let selFile       = null;
-let pollingInt    = null;
-let renderedSet   = new Set();
-let allJobChunks  = [];
-let globalAudioIdx = -1;
-
-// ── Build instrument tree ──────────────────────────────────
-const tree = document.getElementById('instrTree');
-INSTR_CATS.forEach(cat => {
-  const catEl = document.createElement('div');
-  catEl.dataset.cat = cat.cat;
-
-  const catHdr = document.createElement('div');
-  catHdr.className = 'icat';
-  catHdr.innerHTML = `<span class="icat-arrow">▾</span>${cat.label}`;
-  catHdr.onclick = () => { catHdr.classList.toggle('collapsed'); body.style.display = catHdr.classList.contains('collapsed') ? 'none' : 'block'; };
-
-  const body = document.createElement('div');
-  cat.groups.forEach(grp => {
-    const grpEl = document.createElement('div');
-    grpEl.className = 'igrp'; grpEl.textContent = grp.group;
-    body.appendChild(grpEl);
-    grp.items.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'iitem' + (item.id === selInstr ? ' on' : '');
-      el.id = 'ii-' + item.id;
-      el.dataset.name = item.n.toLowerCase();
-      el.dataset.info = item.info;
-      el.innerHTML = `<span class="iitem-ico">🎵</span>${item.n}${item.sub ? `<span class="iitem-key">${item.sub}</span>` : ''}`;
-      el.onclick = () => selectInstr(item.id, item.n, item.info);
-      body.appendChild(el);
-    });
-  });
-
-  catEl.appendChild(catHdr);
-  catEl.appendChild(body);
-  tree.appendChild(catEl);
-});
-
-function selectInstr(id, name, info) {
-  selInstr = id;
-  document.querySelectorAll('.iitem').forEach(x => x.classList.remove('on'));
-  const el = document.getElementById('ii-' + id);
-  if (el) { el.classList.add('on'); el.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
-  document.getElementById('selInstrName').textContent = name;
-  document.getElementById('instrInfo').textContent = info || 'No description available.';
-  showToast('Selected: ' + name, 'ok');
-}
-
-function filterInstruments(q) {
-  q = q.toLowerCase();
-  document.querySelectorAll('.iitem').forEach(el => {
-    el.style.display = el.dataset.name.includes(q) ? 'flex' : 'none';
-  });
-}
-
-// ── Mode ───────────────────────────────────────────────────
-const MODE_INFO = {
-  auto:       'Auto mode: intelligently selects the best stem based on pitch clarity analysis.',
-  vocal:      'Vocal mode: extracts the vocal/melody stem for MIDI conversion.',
-  instrument: 'Instrument mode: uses the instrumental/accompaniment stem.',
-};
-function setMode(m) {
-  selMode = m;
-  ['Auto','Vocal','Instrument'].forEach(n => document.getElementById('mode'+n).classList.remove('on'));
-  document.getElementById('mode' + m[0].toUpperCase() + m.slice(1)).classList.add('on');
-  document.getElementById('modeInfo').textContent = MODE_INFO[m];
-}
-
-// ── Tempo ──────────────────────────────────────────────────
-function updateTempo(v) {
-  v = parseInt(v);
-  document.getElementById('tvnum').textContent = v;
-  document.getElementById('tempoDisplay').textContent = v;
-  const pct = (v - 60) / (200 - 60);
-  document.getElementById('rring').style.strokeDashoffset = 145 - (pct * 145);
-}
-function setTempo(v) { document.getElementById('tempoR').value = v; updateTempo(v); }
-updateTempo(120);
-
-// ── Format ─────────────────────────────────────────────────
-function setFmt(f) {
-  selFmt = f;
-  document.getElementById('fmtWav').classList.toggle('on', f === 'wav');
-  document.getElementById('fmtMp3').classList.toggle('on', f === 'mp3');
-  document.getElementById('fmtSel').value = f;
-}
-
-// ── File handling ──────────────────────────────────────────
-const dz = document.getElementById('dz');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
-document.getElementById('fi').addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
-
-function setFile(f) {
-  if (!f.type.startsWith('audio/') && !/\.(mp3|wav|m4a)$/i.test(f.name)) { showToast('Please upload MP3, WAV or M4A', 'err'); return; }
-  selFile = f;
-  document.getElementById('fname').textContent = f.name;
-  document.getElementById('fmeta').textContent = fmtB(f.size) + ' — ' + f.type;
-  document.getElementById('fpill').classList.add('on');
-  document.getElementById('cvtBtn').disabled = false;
-  document.getElementById('wbox').classList.toggle('on', f.size < 300 * 1024);
-  showToast('Loaded: ' + f.name, 'ok');
-}
-function rmFile() {
-  selFile = null; document.getElementById('fi').value = '';
-  document.getElementById('fpill').classList.remove('on');
-  document.getElementById('wbox').classList.remove('on');
-  document.getElementById('cvtBtn').disabled = true;
-}
-function fmtB(b) { return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB'; }
-
-// ── Progress ───────────────────────────────────────────────
-function setP(v) { document.getElementById('pfill').style.width = Math.min(v,100)+'%'; document.getElementById('ppct').textContent = Math.round(Math.min(v,100))+'%'; }
-function markStep(n, state) {
-  const s = document.getElementById('ps'+n), i = document.getElementById('pi'+n);
-  s.className = 'pstep ' + (state||'');
-  i.textContent = state==='active' ? '...' : state==='done' ? 'OK' : String(n).padStart(2,'0');
-}
-function elapsed(t0) { return ((performance.now()-t0)/1000).toFixed(1)+'s'; }
-
-// ── Convert ────────────────────────────────────────────────
-async function doConvert() {
-  if (!selFile) { showToast('Please select a file first', 'err'); return; }
-  const btn = document.getElementById('cvtBtn');
-  btn.disabled = true; btn.textContent = 'Uploading...';
-  document.getElementById('progWrap').classList.add('on');
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('chunks').innerHTML = '';
-  document.getElementById('orchSection').innerHTML = '';
-  renderedSet.clear(); allJobChunks = [];
-  for(let i=1;i<=5;i++) markStep(i,'');
-  setP(0);
-  const t0 = performance.now();
-
-  try {
-    markStep(1,'active'); setP(8);
-    const fd = new FormData();
-    fd.append('file', selFile, selFile.name);
-    fd.append('instrument', selInstr);
-    fd.append('mode', selMode);
-    fd.append('tempo', document.getElementById('tempoR').value);
-    fd.append('output_fmt', selFmt);
-    fd.append('orchestrate_', document.getElementById('orchToggle').checked ? 'true' : 'false');
-
-    const res = await fetch(API+'/api/convert', { method:'POST', body:fd });
-    if (!res.ok) {
-      const e = await res.json().catch(() => ({ detail:'Error '+res.status }));
-      throw new Error(e.detail || 'Upload failed: '+res.status);
-    }
-    const { job_id } = await res.json();
-    if (!job_id) throw new Error('No job_id returned');
-
-    localStorage.setItem('soundtoscore_job', JSON.stringify({ job_id, instrument:selInstr, fileName:selFile.name }));
-    markStep(1,'done'); markStep(2,'active'); markStep(3,'active'); setP(15);
-    btn.textContent = 'Processing...';
-    showToast('Upload done — processing started!', 'ok');
-    startPolling(job_id, btn, t0);
-
-  } catch(err) {
-    showToast('Error: '+err.message, 'err');
-    document.getElementById('progWrap').classList.remove('on');
-    btn.disabled=false; btn.innerHTML='&#9889; Convert Again';
-    localStorage.removeItem('soundtoscore_job');
-  }
-}
-
-// ── Polling ────────────────────────────────────────────────
-function startPolling(job_id, btn, t0) {
-  if (pollingInt) clearInterval(pollingInt);
-  t0 = t0 || performance.now();
-
-  pollingInt = setInterval(async () => {
-    try {
-      const r = await fetch(API+'/api/status/'+job_id);
-      if (!r.ok) {
-        if (r.status === 404) {
-          clearInterval(pollingInt); pollingInt = null;
-          localStorage.removeItem('soundtoscore_job');
-          showToast('Job expired — please convert again.', 'err');
-          resetBtn(btn); return;
-        }
-        return;
-      }
-      const data = await r.json();
-
-      // Phase label
-      const phase = data.phase || '';
-      const phaseLbl = document.getElementById('phaseLbl');
-      if (phaseLbl) {
-        const phaseMap = {
-          'uploading':'Uploading...','preprocessing':'Preprocessing audio (FFmpeg)...',
-          'separating_stems':'Separating stems (Demucs)...','chunking':'Splitting into 20s chunks...',
-          'converting':'Extracting MIDI...','merging':'Merging into full polished score...',
-          'done':'All done!','failed':'Failed.'
-        };
-        const cm = phase.match(/chunk_(\d+)_of_(\d+)/);
-        phaseLbl.textContent = cm
-          ? `Section ${cm[1]} of ${cm[2]} — extract → clean → enhance → synth`
-          : (phaseMap[phase] || phase);
-      }
-
-      // Progress bar + step indicators
-      if (phase === 'merging') {
-        setP(92); markStep(2,'done'); markStep(3,'done'); markStep(4,'done'); markStep(5,'active');
-      } else if (data.total_chunks > 0) {
-        setP(15 + (data.done_chunks / data.total_chunks) * 70);
-        if (data.done_chunks > 0) {
-          markStep(2,'done'); markStep(3,'active'); markStep(4,'active');
-        }
-      } else if (['preprocessing','separating_stems','chunking'].includes(phase)) {
-        markStep(2,'active');
-        const cur = parseFloat(document.getElementById('pfill').style.width||'15');
-        if(cur < 40) setP(cur + 0.3);
-      }
-
-      // Render new chunks as they stream in
-      if (data.chunks?.length > 0) {
-        document.getElementById('results').style.display = 'block';
-        const cl = document.getElementById('chunksLabel'); if(cl) cl.style.display = 'flex';
-        const cc = document.getElementById('chunksCount');
-        if(cc) cc.textContent = '(' + data.chunks.length + ' of ' + (data.total_chunks||'?') + ')';
-        data.chunks.forEach((chunk, idx) => {
-          if (!renderedSet.has(idx)) {
-            renderedSet.add(idx);
-            allJobChunks.push(chunk);
-            renderChunk(chunk, idx, data.total_chunks);
-            showToast('Section '+(idx+1)+' ready ▶ play now!', 'ok');
-          }
-        });
-      }
-
-      // Quality warning
-      if (data.quality_warning) {
-        document.getElementById('wtxt').textContent = data.quality_warning;
-        document.getElementById('wbox').classList.add('on');
-      }
-
-      // Orchestra
-      if (data.orchestra && Object.keys(data.orchestra).length > 0) {
-        renderOrchestra(data.orchestra);
-      }
-
-      if (data.status === 'success') {
-        clearInterval(pollingInt); pollingInt = null;
-        localStorage.removeItem('soundtoscore_job');
-        markStep(4,'done'); markStep(5,'done'); setP(100);
-        const instrName = document.getElementById('selInstrName').textContent;
-        const fname = selFile ? selFile.name.replace(/\.[^.]+$/,'') : 'audio';
-        document.getElementById('scoreTitle').textContent = fname + ' — ' + instrName;
-        document.getElementById('scoreMeta').textContent = data.total_chunks+' section(s) — '+data.duration+'s total — '+data.elapsed+'s processing';
-        document.getElementById('resTitle').textContent = fname + ' — ' + instrName;
-        document.getElementById('resMeta').textContent = data.total_chunks+' section(s) — '+data.duration+'s — '+data.elapsed+'s';
-        showToast('All '+data.total_chunks+' section(s) complete! 🎉', 'ok');
-        resetBtn(btn);
-        _lastData = data;
-        // Render merged full output
-        if (data.merged) {
-          renderMerged(data.merged, data.total_chunks, data.duration);
-        }
-        buildModal(data);
-      }
-
-      if (data.status === 'failed') {
-        clearInterval(pollingInt); pollingInt = null;
-        localStorage.removeItem('soundtoscore_job');
-        setP(0); document.getElementById('progWrap').classList.remove('on');
-        showToast('Error: '+(data.error||'Processing failed'), 'err');
-        resetBtn(btn);
-      }
-
-    } catch(e) { /* network hiccup — keep polling */ }
-  }, 5000);
-}
-
-function resetBtn(btn) {
-  btn = btn || document.getElementById('cvtBtn');
-  btn.disabled = false; btn.innerHTML = '&#9889; Convert Again';
-}
-
-// ── Render section card ────────────────────────────────────
-function renderChunk(chunk, idx, total) {
-  const cont = document.getElementById('chunks');
-  const instrName = document.getElementById('selInstrName').textContent;
-  const aid='a'+idx, fid='mpf'+idx, tid='mpt'+idx, bid='mpb'+idx;
-
-  const lines = (chunk.transcript_preview||'').split('\n').filter(Boolean).slice(0,8).map(l => {
-    const p = l.trim().split(/\s+/);
-    if (p.length>=2 && /^[A-G]/.test(p[0]))
-      return `<div class="tnote"><span class="tp">${p[0]}</span><span class="tv">${p[1]||''}</span><span class="tt">${p[2]||''}</span></div>`;
-    return '';
-  }).join('');
-
-  const card = document.createElement('div');
-  card.className = 'sc'; card.id = 'sc-'+idx;
-  card.innerHTML =
-    `<div class="sc-hdr">
-      <div class="sc-num">${idx+1}</div>
-      <div style="flex:1">
-        <div class="sc-ttl">Section ${idx+1}${total>1?' of '+total:''} — ${instrName}</div>
-        <div class="sc-t">${chunk.start}s — ${chunk.end}s</div>
-      </div>
-      <div class="sc-badge">Ready</div>
-    </div>
-    <div class="sc-body">
-      <div class="mp">
-        <button class="mpb" id="${bid}" onclick="playSection(${idx})">&#9654;</button>
-        <div class="mpbar" onclick="seekSec(event,${idx})"><div class="mpf" id="${fid}"></div></div>
-        <div class="mpt" id="${tid}">0:00 / 0:00</div>
-        <audio id="${aid}" src="${API+chunk.audio}" crossorigin="anonymous"
-          ontimeupdate="tickSec(${idx})" onloadedmetadata="metaSec(${idx})" onended="endSec(${idx})"></audio>
-      </div>
-      <div class="dlrow">
-        <button class="dlbtn midi" onclick="dlFile('${API+chunk.midi}','s${idx+1}.mid')">&#9834; MIDI</button>
-        <button class="dlbtn wav"  onclick="dlFile('${API+chunk.audio}','s${idx+1}.wav')">&#128266; WAV</button>
-        <button class="dlbtn txt"  onclick="dlFile('${API+chunk.transcript}','s${idx+1}_notes.txt')">&#128196; Transcript</button>
-        ${chunk.sheet ? `<button class="dlbtn pdf" onclick="dlFile('${API+chunk.sheet}','s${idx+1}_sheet.pdf')">&#127926; Sheet</button>` : ''}
-      </div>
-      <div class="trbox">
-        <div class="trhdr"><span>&#9834; Note Preview</span><span>pitch · vel · time</span></div>
-        <div class="trbody">${lines||'<span style="color:var(--muted)">Download transcript for full notes.</span>'}</div>
-      </div>
-    </div>`;
-  cont.appendChild(card);
-
-  // Load into global player
-  loadGlobal(idx, API+chunk.audio);
-}
-
-// ── Orchestra section ──────────────────────────────────────
-function renderOrchestra(orch) {
-  const sec = document.getElementById('orchSection');
-  if (sec.innerHTML) return; // already rendered
-  const div = document.createElement('div');
-  div.className = 'orch-section';
-  div.innerHTML = '<div class="orch-title">Full Band Orchestration</div>';
-  let layerIdx = 0;
-  for (const [name, url] of Object.entries(orch)) {
-    const lid = 'ol'+layerIdx;
-    const row = document.createElement('div');
-    row.className = 'orch-layer';
-    row.innerHTML =
-      `<span class="orch-lname">${name}</span>
-       <button class="orch-lplay" id="${lid}btn" onclick="playOrchLayer('${lid}', '${API+url}')">&#9654;</button>
-       <audio id="${lid}" src="${API+url}" crossorigin="anonymous" onended="document.getElementById('${lid}btn').innerHTML='&#9654;'"></audio>`;
-    div.appendChild(row);
-    layerIdx++;
-  }
-  sec.appendChild(div);
-}
-
-function playOrchLayer(lid, url) {
-  const a = document.getElementById(lid);
-  const b = document.getElementById(lid+'btn');
-  if (!a) return;
-  if (a.paused) { a.play(); b.innerHTML='&#9646;&#9646;'; }
-  else { a.pause(); b.innerHTML='&#9654;'; }
-}
-
-// ── Section audio players ──────────────────────────────────
-function playSection(idx) {
-  const a = document.getElementById('a'+idx), b = document.getElementById('mpb'+idx);
-  if (!a) return;
-  if (a.paused) {
-    document.querySelectorAll('audio').forEach((au,i) => { au.pause(); const bb=document.getElementById('mpb'+i); if(bb) bb.innerHTML='&#9654;'; });
-    a.play().catch(e => showToast('Playback: '+e.message,'err'));
-    b.innerHTML='&#9646;&#9646;';
-    loadGlobal(idx, a.src);
-  } else { a.pause(); b.innerHTML='&#9654;'; }
-}
-function tickSec(idx) {
-  const a=document.getElementById('a'+idx); if(!a||!a.duration) return;
-  document.getElementById('mpf'+idx).style.width=((a.currentTime/a.duration)*100)+'%';
-  document.getElementById('mpt'+idx).textContent=fmt(a.currentTime)+' / '+fmt(a.duration);
-}
-function metaSec(idx) { const a=document.getElementById('a'+idx); if(a) document.getElementById('mpt'+idx).textContent='0:00 / '+fmt(a.duration); }
-function endSec(idx) { const b=document.getElementById('mpb'+idx); if(b) b.innerHTML='&#9654;'; }
-function seekSec(e,idx) { const a=document.getElementById('a'+idx); if(!a||!a.duration) return; a.currentTime=(e.offsetX/e.currentTarget.offsetWidth)*a.duration; }
-
-// ── Global topbar player ───────────────────────────────────
-function loadGlobal(idx, src) {
-  globalAudioIdx = idx;
-  const ga = document.getElementById('globalAudio');
-  ga.src = src;
-  document.getElementById('tbPlay').style.display = 'flex';
-  document.getElementById('globalPlay').innerHTML = '&#9654;';
-}
-function toggleGlobal() {
-  const ga=document.getElementById('globalAudio'), btn=document.getElementById('globalPlay');
-  if(ga.paused) { ga.play(); btn.innerHTML='&#9646;&#9646;'; }
-  else { ga.pause(); btn.innerHTML='&#9654;'; }
-}
-function globalTick() {
-  const ga=document.getElementById('globalAudio'); if(!ga.duration) return;
-  document.getElementById('globalFill').style.width=((ga.currentTime/ga.duration)*100)+'%';
-  document.getElementById('globalTime').textContent=fmt(ga.currentTime)+' / '+fmt(ga.duration);
-}
-function globalMeta() { const ga=document.getElementById('globalAudio'); document.getElementById('globalTime').textContent='0:00 / '+fmt(ga.duration); }
-function globalEnded() { document.getElementById('globalPlay').innerHTML='&#9654;'; }
-function seekGlobal(e) {
-  const ga=document.getElementById('globalAudio'); if(!ga.duration) return;
-  const bar=e.currentTarget; ga.currentTime=(e.offsetX/bar.offsetWidth)*ga.duration;
-}
-
-// ── Util ───────────────────────────────────────────────────
-function fmt(s) { s=Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
-
-// ── Download modal ─────────────────────────────────────────
-let _modalData = null;
-function buildModal(data) { _modalData = data; }
-
-function showModal() {
-  const mc = document.getElementById('modalContent');
-  if (!allJobChunks.length) {
-    mc.innerHTML = '<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:20px">No conversion yet. Upload and convert an audio file first.</div>';
-  } else {
-    let html = '<div class="modal-section"><div class="modal-lbl">Sections</div><div class="modal-links">';
-    allJobChunks.forEach((c, i) => {
-      html += `<button class="modal-link" onclick="dlFile('${API+c.audio}','section${i+1}.wav')"><span class="modal-link-icon">&#128266;</span>Section ${i+1} — WAV Audio</button>`;
-      html += `<button class="modal-link" onclick="dlFile('${API+c.midi}','section${i+1}.mid')"><span class="modal-link-icon">&#9834;</span>Section ${i+1} — MIDI</button>`;
-      if (c.sheet) html += `<button class="modal-link" onclick="dlFile('${API+c.sheet}','section${i+1}_sheet.pdf')"><span class="modal-link-icon">&#127926;</span>Section ${i+1} — Sheet Music PDF</button>`;
-      html += `<button class="modal-link" onclick="dlFile('${API+c.transcript}','section${i+1}_notes.txt')"><span class="modal-link-icon">&#128196;</span>Section ${i+1} — Transcript</button>`;
-    });
-    html += '</div></div>';
-    mc.innerHTML = html;
-  }
-  document.getElementById('modal').classList.add('on');
-}
-function closeModal() { document.getElementById('modal').classList.remove('on'); }
-document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
-
-// ── Toast ──────────────────────────────────────────────────
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast '+(type||'')+' on';
-  setTimeout(() => t.classList.remove('on'), 3500);
-}
-
-// ── Resume from localStorage ───────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('soundtoscore_job');
-  if (saved) {
-    try {
-      const {job_id, instrument, fileName} = JSON.parse(saved);
-      if (job_id) {
-        if (instrument) { selectInstr(instrument, instrument, ''); selInstr = instrument; }
-        showToast('Resuming previous job...', 'info');
-        document.getElementById('progWrap').classList.add('on');
-        document.getElementById('results').style.display = 'block';
-        const btn = document.getElementById('cvtBtn');
-        btn.disabled = true; btn.textContent = 'Processing...';
-        if (fileName) { document.getElementById('fname').textContent = fileName; document.getElementById('fpill').classList.add('on'); }
-        startPolling(job_id, btn);
-      }
-    } catch(e) { localStorage.removeItem('soundtoscore_job'); }
-  }
-});
-
-// ── Cross-origin download via fetch + blob ─────────────────
-async function dlFile(url, filename) {
-  showToast('Downloading ' + filename + '...', 'info');
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const blob = await r.blob();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    showToast('Downloaded: ' + filename, 'ok');
-  } catch(e) {
-    // Fallback: open in new tab
-    window.open(url, '_blank');
-    showToast('Opening in new tab: ' + filename, 'info');
-  }
-}
-
-
-// ═══════════════════════════════════════════════════════════
-// RESPONSIVE: Bottom nav tabs + drawer logic
-// ═══════════════════════════════════════════════════════════
-
-function isMobile() { return window.innerWidth < 900; }
-
-function bnTab(tab) {
-  if (!isMobile()) return;
-  // deactivate all
-  ['bnHome','bnInstr','bnResults','bnSettings'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('on');
-  });
-
-  closeDrawers();
-
-  if (tab === 'home') {
-    document.getElementById('bnHome').classList.add('on');
-    document.getElementById('uploadCard').scrollIntoView({behavior:'smooth', block:'start'});
-  }
-  else if (tab === 'instr') {
-    document.getElementById('bnInstr').classList.add('on');
-    openDrawer('left');
-  }
-  else if (tab === 'results') {
-    document.getElementById('bnResults').classList.add('on');
-    const res = document.getElementById('results');
-    if (res.style.display !== 'none') {
-      res.scrollIntoView({behavior:'smooth', block:'start'});
-    } else {
-      showToast('No results yet — convert an audio file first', 'info');
-    }
-  }
-  else if (tab === 'settings') {
-    document.getElementById('bnSettings').classList.add('on');
-    openDrawer('right');
-  }
-}
-
-function openDrawer(side) {
-  const overlay = document.getElementById('drawerOverlay');
-  overlay.classList.add('on');
-
-  if (side === 'left') {
-    const lp = document.getElementById('leftPanel');
-    lp.classList.add('drawer-open');
-    const btn = document.getElementById('leftDrawerClose');
-    if (btn) btn.style.display = 'flex';
-  } else {
-    const rp = document.getElementById('rightPanel');
-    rp.classList.add('drawer-open');
-    const btn = document.getElementById('rightDrawerClose');
-    if (btn) btn.style.display = 'flex';
-  }
-  // Prevent body scroll
-  document.body.style.overflow = 'hidden';
-}
-
-function closeDrawers() {
-  document.getElementById('drawerOverlay').classList.remove('on');
-  const lp = document.getElementById('leftPanel');
-  const rp = document.getElementById('rightPanel');
-  if (lp) {
-    lp.classList.remove('drawer-open');
-    const btn = document.getElementById('leftDrawerClose');
-    if (btn) btn.style.display = 'none';
-  }
-  if (rp) {
-    rp.classList.remove('drawer-open');
-    const btn = document.getElementById('rightDrawerClose');
-    if (btn) btn.style.display = 'none';
-  }
-  // Restore scroll
-  document.body.style.overflow = '';
-  // deactivate nav
-  ['bnHome','bnInstr','bnResults','bnSettings'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('on');
-  });
-}
-
-// Sync mobile mode buttons with desktop mode buttons
-const origSetMode = setMode;
-// Patch setMode to also update mobile buttons
-window.setMode = function(m) {
-  origSetMode(m);
-  ['Auto','Vocal','Instrument'].forEach(n => {
-    const mob = document.getElementById('mode'+n+'M');
-    if (mob) mob.classList.remove('on');
-  });
-  const mobActive = document.getElementById('mode'+m[0].toUpperCase()+m.slice(1)+'M');
-  if (mobActive) mobActive.classList.add('on');
-  // Close drawer after selection on mobile
-  if (isMobile()) {
-    setTimeout(closeDrawers, 150);
-  }
-};
-
-// Update results badge
-function updateBadge(count) {
-  const badge = document.getElementById('bnBadge');
-  if (!badge) return;
-  if (count > 0) {
-    badge.textContent = count;
-    badge.classList.add('on');
-  } else {
-    badge.classList.remove('on');
-  }
-}
-
-// Patch renderChunk to update badge
-const origRenderChunk = renderOneChunk || renderChunk;
-function renderChunk(chunk, idx, total) {
-  origRenderChunk(chunk, idx, total);
-  updateBadge(renderedSet.size);
-}
-
-// Handle swipe-to-close drawers
-let touchStartX = 0;
-document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
-document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  const lp = document.getElementById('leftPanel');
-  const rp = document.getElementById('rightPanel');
-  if (lp && lp.classList.contains('drawer-open') && dx < -60) closeDrawers();
-  if (rp && rp.classList.contains('drawer-open') && dx > 60) closeDrawers();
-}, {passive:true});
-
-// Handle resize: auto-close drawers on desktop
-window.addEventListener('resize', () => {
-  if (!isMobile()) {
-    closeDrawers();
-    document.body.style.overflow = '';
-  }
-});
-
-// Keyboard: Escape closes drawers and modal
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeDrawers();
-    closeModal();
-  }
-});
-
-
-// ─── MERGED FULL OUTPUT ───────────────────────────────────
-function renderMerged(merged, totalChunks, duration) {
-  const sec = document.getElementById('mergedSection');
-  if (!sec) return;
-  sec.style.display = 'block';
-
-  const instrName = document.getElementById('selInstrName').textContent;
-  document.getElementById('mergedTitle').textContent =
-    'Full Score — ' + instrName;
-  document.getElementById('mergedMeta').textContent =
-    totalChunks + ' sections merged · ' + duration + 's · clean + enhance applied';
-
-  // Set audio source
-  const audio = document.getElementById('audioMerged');
-  audio.src = API + merged.audio;
-
-  // Download buttons
-  const dlRow = document.getElementById('mergedDlRow');
-  dlRow.innerHTML = '';
-  const dlItems = [
-    {url: merged.audio, name: 'full_score.wav',  cls: 'wav',  icon: '🔊', label: 'WAV (Full)'},
-    {url: merged.midi,  name: 'full_score.mid',  cls: 'midi', icon: '♩',  label: 'MIDI (Full)'},
-    {url: merged.transcript, name: 'full_notes.txt', cls: 'txt', icon: '📄', label: 'Transcript'},
-  ];
-  if (merged.sheet) {
-    dlItems.push({url: merged.sheet, name: 'full_sheet.pdf', cls: 'pdf', icon: '🎼', label: 'Sheet Music'});
-  }
-  dlItems.forEach(item => {
-    const btn = document.createElement('button');
-    btn.className = 'dlbtn ' + item.cls;
-    btn.innerHTML = item.icon + ' ' + item.label;
-    btn.onclick = () => dlFile(API + item.url, item.name);
-    dlRow.appendChild(btn);
-  });
-
-  // Transcript preview
-  const lines = (merged.preview || '').split('\n').filter(Boolean).slice(0, 12).map(l => {
-    const p = l.trim().split(/\s+/);
-    if (p.length >= 2 && /^[A-G]/.test(p[0])) {
-      return `<div class="tnote"><span class="tp">${p[0]}</span><span class="tv">${p[1]||''}</span><span class="tt">${p[2]||''}</span></div>`;
-    }
-    return '';
-  }).join('');
-  document.getElementById('mergedTranscript').innerHTML =
-    lines || '<span style="color:var(--muted)">Download transcript for full note list.</span>';
-
-  // Scroll to merged section
-  sec.scrollIntoView({behavior: 'smooth', block: 'start'});
-  showToast('Full merged output ready! 🎼', 'ok');
-}
-
-function playMerged() {
-  const a = document.getElementById('audioMerged');
-  const b = document.getElementById('mpbMerged');
-  if (!a.src) return;
-  if (a.paused) {
-    document.querySelectorAll('audio').forEach(au => au.pause());
-    document.querySelectorAll('.mpb').forEach(btn => btn.innerHTML = '&#9654;');
-    a.play().catch(e => showToast('Playback: ' + e.message, 'err'));
-    b.innerHTML = '&#9646;&#9646;';
-  } else { a.pause(); b.innerHTML = '&#9654;'; }
-}
-function tickMerged() {
-  const a = document.getElementById('audioMerged'); if(!a||!a.duration) return;
-  document.getElementById('mpfMerged').style.width = ((a.currentTime/a.duration)*100)+'%';
-  document.getElementById('mptMerged').textContent = fmt(a.currentTime)+' / '+fmt(a.duration);
-}
-function metaMerged() {
-  const a = document.getElementById('audioMerged');
-  if(a) document.getElementById('mptMerged').textContent = '0:00 / '+fmt(a.duration);
-}
-function endMerged() { document.getElementById('mpbMerged').innerHTML = '&#9654;'; }
-function seekMerged(e) {
-  const a = document.getElementById('audioMerged');
-  if(!a||!a.duration) return;
-  a.currentTime = (e.offsetX/e.currentTarget.offsetWidth)*a.duration;
-}
-
-// Also add merged to download modal
-const _origBuildModal = buildModal || function(){};
-function buildModal(data) {
-  _origBuildModal(data);
-  _lastData = data;
-}
-let _lastData = null;
-
-const _origShowModal = showModal;
-function showModal() {
-  const mc = document.getElementById('modalContent');
-  const chunks = allJobChunks;
-  const merged = _lastData && _lastData.merged ? _lastData.merged : null;
-
-  if (!chunks.length && !merged) {
-    mc.innerHTML = '<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:20px">No conversion yet.</div>';
-    document.getElementById('modal').classList.add('on');
-    return;
-  }
-
-  let html = '';
-
-  // Full merged downloads at top
-  if (merged) {
-    html += '<div class="modal-section"><div class="modal-lbl" style="color:var(--purple)">Full Merged Output</div><div class="modal-links">';
-    html += `<button class="modal-link" onclick="dlFile('${API+merged.audio}','full_score.wav')"><span class="modal-link-icon">🔊</span>Full Score — WAV Audio</button>`;
-    html += `<button class="modal-link" onclick="dlFile('${API+merged.midi}','full_score.mid')"><span class="modal-link-icon">♩</span>Full Score — MIDI</button>`;
-    html += `<button class="modal-link" onclick="dlFile('${API+merged.transcript}','full_notes.txt')"><span class="modal-link-icon">📄</span>Full Score — Transcript</button>`;
-    if (merged.sheet) html += `<button class="modal-link" onclick="dlFile('${API+merged.sheet}','full_sheet.pdf')"><span class="modal-link-icon">🎼</span>Full Score — Sheet Music</button>`;
-    html += '</div></div>';
-  }
-
-  // Per-section downloads
-  if (chunks.length) {
-    html += '<div class="modal-section"><div class="modal-lbl">Individual Sections</div><div class="modal-links">';
-    chunks.forEach((c, i) => {
-      html += `<button class="modal-link" onclick="dlFile('${API+c.audio}','section${i+1}.wav')"><span class="modal-link-icon">🔊</span>Section ${i+1} (${c.start}s–${c.end}s) — WAV</button>`;
-      html += `<button class="modal-link" onclick="dlFile('${API+c.midi}','section${i+1}.mid')"><span class="modal-link-icon">♩</span>Section ${i+1} — MIDI</button>`;
-      if (c.sheet) html += `<button class="modal-link" onclick="dlFile('${API+c.sheet}','section${i+1}_sheet.pdf')"><span class="modal-link-icon">🎼</span>Section ${i+1} — Sheet</button>`;
-      html += `<button class="modal-link" onclick="dlFile('${API+c.transcript}','section${i+1}_notes.txt')"><span class="modal-link-icon">📄</span>Section ${i+1} — Transcript</button>`;
-    });
-    html += '</div></div>';
-  }
-
-  mc.innerHTML = html;
-  document.getElementById('modal').classList.add('on');
-}
+// Set initial bottom nav home tab active
+(function(){
+  const bh=document.getElementById('bnHome'); if(bh) bh.classList.add('on');
+})();
 
 </script>
 </body>
