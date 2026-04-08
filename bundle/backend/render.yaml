@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: soundtoscore-v14
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
