@@ -27,7 +27,7 @@ import uuid, shutil, time, logging, json, threading
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from config import (
     UPLOAD_DIR, OUTPUT_DIR,
@@ -52,8 +52,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
     allow_headers=["*"],
+    expose_headers=["Content-Length", "Content-Range", "Accept-Ranges",
+                    "Content-Disposition", "Content-Type"],
 )
 
 # ══════════════════════════════════════════════════════════
@@ -274,7 +276,8 @@ def _pipeline(job_id, src_path, instrument, mode, tempo, output_fmt):
             out_dir = str(job_dir / f"s{idx}")
             outputs = process_chunk(
                 cwav, out_dir, instrument, tempo, output_fmt, sf2,
-                chunk_title=f"Section {idx}"
+                chunk_title=f"Section {idx}",
+                mode=mode
             )
 
             # Absolute path to the final MIDI for this chunk (used by merger)
@@ -390,14 +393,32 @@ def status(job_id: str):
 # FILE SERVE
 # ══════════════════════════════════════════════════════════
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin":  "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Range, Content-Type",
+    "Access-Control-Expose-Headers":"Content-Length, Content-Range, Accept-Ranges",
+}
+
+@app.options("/api/files/{job_id}/{section}/{filename}")
+@app.options("/api/merged/{job_id}/{filename}")
+async def options_handler(*args, **kwargs):
+    """Handle CORS preflight requests for file downloads."""
+    return Response(status_code=200, headers=CORS_HEADERS)
+
 @app.get("/api/files/{job_id}/{section}/{filename}")
 def serve_chunk(job_id: str, section: str, filename: str):
     if not job_id.isalnum() or ".." in section or ".." in filename:
         raise HTTPException(400, "Invalid path")
     p = OUTPUT_DIR / job_id / section / filename
     if not p.exists():
+        log.warning(f"404: {p}")
         raise HTTPException(404, f"File not found: {p.name}")
-    return FileResponse(str(p), filename=filename, media_type=_mime(filename))
+    return FileResponse(
+        str(p), filename=filename,
+        media_type=_mime(filename),
+        headers={**CORS_HEADERS, "Cache-Control": "no-cache"},
+    )
 
 @app.get("/api/merged/{job_id}/{filename}")
 def serve_merged(job_id: str, filename: str):
@@ -405,8 +426,13 @@ def serve_merged(job_id: str, filename: str):
         raise HTTPException(400, "Invalid path")
     p = OUTPUT_DIR / job_id / "merged" / filename
     if not p.exists():
+        log.warning(f"404 merged: {p}")
         raise HTTPException(404, f"Merged file not found: {p.name}")
-    return FileResponse(str(p), filename=filename, media_type=_mime(filename))
+    return FileResponse(
+        str(p), filename=filename,
+        media_type=_mime(filename),
+        headers={**CORS_HEADERS, "Cache-Control": "no-cache"},
+    )
 
 def _mime(f: str) -> str:
     return {".mid":"audio/midi",".midi":"audio/midi",".wav":"audio/wav",
