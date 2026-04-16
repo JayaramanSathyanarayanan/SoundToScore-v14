@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["ffmpeg", "fluidsynth", "python311", "libsndfile", "curl", "musescore"]
+nixPkgs = ["ffmpeg", "fluidsynth", "python311", "libsndfile", "curl"]
 
 [phases.install]
 cmds = [
   "pip install -r requirements.txt",
-  "mkdir -p assets/soundfonts",
-  "curl -L --retry 5 --retry-delay 3 'https://github.com/JayaramanSathyanarayanan/SoundToScore/releases/download/v1.0/GeneralUser_GS.sf2' -o assets/soundfonts/GeneralUser_GS.sf2 || echo 'SF will be downloaded at runtime'"
+  "mkdir -p assets/soundfonts uploads outputs temp",
+  "curl -L --retry 5 --retry-delay 3 'https://github.com/JayaramanSathyanarayanan/SoundToScore/releases/download/v1.0/GeneralUser_GS.sf2' -o assets/soundfonts/GeneralUser_GS.sf2 || echo 'SF will download at runtime'"
 ]
 
 [start]
