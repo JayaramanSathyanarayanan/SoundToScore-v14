@@ -13,7 +13,7 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download SoundFont at build time (baked in)
+# Pre-download SoundFont at build time
 RUN mkdir -p assets/soundfonts && \
     curl -L --retry 5 --retry-delay 3 \
     "https://github.com/JayaramanSathyanarayanan/SoundToScore/releases/download/v1.0/GeneralUser_GS.sf2" \
@@ -23,5 +23,7 @@ RUN mkdir -p assets/soundfonts && \
 
 RUN mkdir -p uploads outputs temp
 
+# Use $PORT from Render environment (default 10000)
+ENV PORT=10000
 EXPOSE 10000
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "10000"]
+CMD uvicorn app:app --host 0.0.0.0 --port ${PORT}
